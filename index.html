@@ -807,7 +807,7 @@ fillBtn.onclick = ()=> {
   let idx=1;
   while(pool.length < 700){
     const b = base[(pool.length) % base.length];
-    pool.push({id: b.id + '-dup' + idx, prototype: b.prototype + '·占位' + idx, source: b.source, tags: b.tags});
+    pool.push({id: b.id + '-dup' + idx, prototype: b.prototype, source: b.source, tags: b.tags});
     idx++;
   }
   renderPool(getFiltered());
@@ -833,3 +833,4 @@ renderPool(pool);
 </script>
 </body>
 </html>
+
