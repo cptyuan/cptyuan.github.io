@@ -16,7 +16,7 @@
   .controls{display:flex;gap:8px;align-items:center}
   button{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
   button.primary{background:linear-gradient(90deg,#3b2c63,#643c2a);border: none;color:#fff;box-shadow:0 6px 14px rgba(0,0,0,0.5)}
-  .grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
   .panel{background:var(--panel);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
   .pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;max-height:420px;overflow:auto;padding:4px}
   .item{padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);font-size:13px}
@@ -41,6 +41,13 @@
   display:flex !important;
   justify-content:center;
 }
+  header{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px 0;      /* 拉开头部高度 */
+}
+
   
 </style>
 </head>
@@ -844,6 +851,7 @@ renderPool(pool);
 </script>
 </body>
 </html>
+
 
 
 
