@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>从夯到拉 - 黄金比例版</title>
+    <title>从夯到拉 - 批量导入版</title>
     <style>
         :root {
             --bg-main: #0a0a0a;
@@ -23,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* 左侧主表格区域 */
         .main-content {
             flex-grow: 1;
             padding: 30px;
@@ -35,7 +34,7 @@
 
         .tier-container {
             width: 100%;
-            max-width: 1150px; /* 调大档位区宽度，视觉更饱满 */
+            max-width: 1150px;
             background: #000;
             border: 1px solid #333;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
@@ -43,7 +42,7 @@
 
         .tier-row {
             display: flex;
-            min-height: 90px; /* 稍微提升行高 */
+            min-height: 90px;
             border-bottom: 1px solid #222;
         }
 
@@ -67,9 +66,9 @@
             align-content: flex-start;
             padding: 8px;
             background-color: rgba(255, 255, 255, 0.02);
+            min-width: 200px;
         }
 
-        /* 右侧侧边栏 - 拓宽以适配 4 列排列 */
         .sidebar {
             width: 320px; 
             min-width: 320px;
@@ -88,13 +87,17 @@
             margin-bottom: 25px;
         }
 
-        input[type="text"] {
+        /* 文本框升级为 textarea 方便粘贴多行内容 */
+        textarea#text-input {
             padding: 12px;
             background: #000;
             border: 1px solid #444;
             color: white;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
         }
 
         button {
@@ -103,14 +106,13 @@
             border: none;
             border-radius: 4px;
             font-weight: bold;
-            transition: background 0.2s;
+            transition: 0.2s;
         }
 
         .btn-add { background: #3f51b5; color: white; }
         .btn-img { background: #4caf50; color: white; }
         button:hover { filter: brightness(1.2); }
 
-        /* 素材池 - 优化排列间隙 */
         #pool {
             flex-grow: 1;
             border: 2px dashed #444;
@@ -121,10 +123,9 @@
             flex-wrap: wrap;
             padding: 12px;
             align-content: flex-start;
-            gap: 10px; /* 素材块之间的间距 */
+            gap: 10px;
         }
 
-        /* 素材块 - 68px 配合 320px 侧边栏能完美并排 */
         .item {
             width: 68px;
             height: 68px;
@@ -134,17 +135,18 @@
             align-items: center;
             justify-content: center;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             border: 1px solid #555;
             overflow: hidden;
             text-align: center;
             box-sizing: border-box;
             user-select: none;
+            padding: 4px;
+            line-height: 1.2;
         }
         .item:active { cursor: grabbing; }
         .item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 档位色彩 */
         .r1 .tier-label { background: var(--color-1); }
         .r2 .tier-label { background: var(--color-2); }
         .r3 .tier-label { background: var(--color-3); }
@@ -154,7 +156,6 @@
         .r7 .tier-label { background: var(--color-7); }
         .r8 .tier-label { background: var(--color-8); color: white; }
 
-        /* 打印隐藏侧栏 */
         @media print {
             .sidebar { display: none; }
             .main-content { padding: 0; }
@@ -178,16 +179,16 @@
     </div>
 
     <div class="sidebar">
-        <h3 style="margin-top:0; color:#aaa; font-size: 1.1rem;">素材管理</h3>
+        <h3 style="margin-top:0; color:#aaa; font-size: 1.1rem;">批量素材管理</h3>
         <div class="input-group">
-            <input type="text" id="text-input" placeholder="输入名称后回车...">
-            <button class="btn-add" onclick="addTextItem()">添加词组</button>
+            <textarea id="text-input" placeholder="输入名称，多个名称请换行或用逗号隔开..."></textarea>
+            <button class="btn-add" onclick="processInput()">批量添加文本</button>
             <button class="btn-img" onclick="document.getElementById('file-input').click()">上传本地图片</button>
             <input type="file" id="file-input" accept="image/*" style="display:none" onchange="addImageItem(event)">
         </div>
-        <div id="pool" ondrop="drop(event)" ondragover="allowDrop(event)">
-            </div>
-        <button onclick="window.print()" style="margin-top: 15px; background: #444; color: white;">完成评分 (导出/打印)</button>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">备选素材池：</p>
+        <div id="pool" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <button onclick="window.print()" style="margin-top: 15px; background: #444; color: white;">完成并保存页面</button>
     </div>
 
     <script>
@@ -204,38 +205,45 @@
         }
 
         let idCounter = 0;
-        function createItem() {
+        function createItem(content, isImage = false) {
             const div = document.createElement('div');
             div.className = 'item';
             div.draggable = true;
             div.id = 'item-' + idCounter++;
             div.ondragstart = drag;
+            
+            if(isImage) {
+                const img = document.createElement('img');
+                img.src = content;
+                div.appendChild(img);
+            } else {
+                div.textContent = content;
+            }
             return div;
         }
 
-        function addTextItem() {
-            const val = document.getElementById('text-input').value;
-            if (!val) return;
-            const item = createItem();
-            item.textContent = val;
-            document.getElementById('pool').appendChild(item);
+        // 批量处理逻辑
+        function processInput() {
+            const rawValue = document.getElementById('text-input').value;
+            if (!rawValue) return;
+
+            // 识别换行、中文逗号、英文逗号作为分隔符
+            const items = rawValue.split(/[\n,，]+/).map(s => s.trim()).filter(s => s !== "");
+
+            items.forEach(text => {
+                const item = createItem(text);
+                document.getElementById('pool').appendChild(item);
+            });
+
             document.getElementById('text-input').value = '';
         }
-
-        // 监听回车键添加
-        document.getElementById('text-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') addTextItem();
-        });
 
         function addImageItem(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                const item = createItem();
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                item.appendChild(img);
+                const item = createItem(e.target.result, true);
                 document.getElementById('pool').appendChild(item);
             }
             reader.readAsDataURL(file);
