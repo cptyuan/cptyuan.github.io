@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>档位评分表 - 最终版</title>
+    <title>从夯到拉 - 黄金比例版</title>
     <style>
         :root {
             --bg-main: #0a0a0a;
@@ -26,34 +26,35 @@
         /* 左侧主表格区域 */
         .main-content {
             flex-grow: 1;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            align-items: center; /* 居中显示，避免靠左太极端 */
+            align-items: center; 
         }
 
         .tier-container {
             width: 100%;
-            max-width: 1000px; /* 限制最大宽度，比例最舒适 */
+            max-width: 1150px; /* 调大档位区宽度，视觉更饱满 */
             background: #000;
             border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         .tier-row {
             display: flex;
-            min-height: 85px; /* 适中的行高 */
+            min-height: 90px; /* 稍微提升行高 */
             border-bottom: 1px solid #222;
         }
 
         .tier-label {
-            width: 110px;
-            min-width: 110px;
+            width: 120px;
+            min-width: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #000;
             padding: 10px;
             text-align: center;
@@ -64,14 +65,14 @@
             display: flex;
             flex-wrap: wrap;
             align-content: flex-start;
-            padding: 5px;
+            padding: 8px;
             background-color: rgba(255, 255, 255, 0.02);
         }
 
-        /* 右侧固定侧边栏 */
+        /* 右侧侧边栏 - 拓宽以适配 4 列排列 */
         .sidebar {
-            width: 260px;
-            min-width: 260px;
+            width: 320px; 
+            min-width: 320px;
             background: var(--sidebar-bg);
             border-left: 1px solid #333;
             display: flex;
@@ -83,48 +84,50 @@
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
         input[type="text"] {
-            padding: 10px;
+            padding: 12px;
             background: #000;
             border: 1px solid #444;
             color: white;
             border-radius: 4px;
+            font-size: 1rem;
         }
 
         button {
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
             border: none;
             border-radius: 4px;
             font-weight: bold;
-            transition: 0.2s;
+            transition: background 0.2s;
         }
 
         .btn-add { background: #3f51b5; color: white; }
         .btn-img { background: #4caf50; color: white; }
-        button:hover { opacity: 0.8; }
+        button:hover { filter: brightness(1.2); }
 
+        /* 素材池 - 优化排列间隙 */
         #pool {
             flex-grow: 1;
             border: 2px dashed #444;
-            border-radius: 6px;
+            border-radius: 8px;
             background: #111;
             overflow-y: auto;
             display: flex;
             flex-wrap: wrap;
-            padding: 10px;
+            padding: 12px;
             align-content: flex-start;
-            gap: 8px;
+            gap: 10px; /* 素材块之间的间距 */
         }
 
-        /* 卡片尺寸调整为 65px，精致且能放下较多内容 */
+        /* 素材块 - 68px 配合 320px 侧边栏能完美并排 */
         .item {
-            width: 65px;
-            height: 65px;
+            width: 68px;
+            height: 68px;
             background: #333;
             cursor: grab;
             display: flex;
@@ -136,10 +139,12 @@
             overflow: hidden;
             text-align: center;
             box-sizing: border-box;
+            user-select: none;
         }
+        .item:active { cursor: grabbing; }
         .item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 档位配色 */
+        /* 档位色彩 */
         .r1 .tier-label { background: var(--color-1); }
         .r2 .tier-label { background: var(--color-2); }
         .r3 .tier-label { background: var(--color-3); }
@@ -148,12 +153,18 @@
         .r6 .tier-label { background: var(--color-6); }
         .r7 .tier-label { background: var(--color-7); }
         .r8 .tier-label { background: var(--color-8); color: white; }
+
+        /* 打印隐藏侧栏 */
+        @media print {
+            .sidebar { display: none; }
+            .main-content { padding: 0; }
+        }
     </style>
 </head>
 <body>
 
     <div class="main-content">
-        <h3 style="color: #666; margin-top: 0; letter-spacing: 1px;">从夯到拉 · 评分面板</h3>
+        <h2 style="color: #ccc; margin-top: 0; margin-bottom: 20px; letter-spacing: 2px;">从夯到拉 · 档位表</h2>
         <div class="tier-container">
             <div class="tier-row r1"><div class="tier-label">惊为天人</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
             <div class="tier-row r2"><div class="tier-label">臻于化境</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
@@ -167,16 +178,16 @@
     </div>
 
     <div class="sidebar">
-        <h4 style="margin-top:0; color:#888;">管理控制台</h4>
+        <h3 style="margin-top:0; color:#aaa; font-size: 1.1rem;">素材管理</h3>
         <div class="input-group">
-            <input type="text" id="text-input" placeholder="输入名称...">
-            <button class="btn-add" onclick="addTextItem()">添加词组文本</button>
+            <input type="text" id="text-input" placeholder="输入名称后回车...">
+            <button class="btn-add" onclick="addTextItem()">添加词组</button>
             <button class="btn-img" onclick="document.getElementById('file-input').click()">上传本地图片</button>
             <input type="file" id="file-input" accept="image/*" style="display:none" onchange="addImageItem(event)">
         </div>
-        <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">待处理素材池 (拖拽):</p>
-        <div id="pool" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        <button onclick="window.print()" style="margin-top: 15px; background: #444; color: white;">保存为图片/PDF</button>
+        <div id="pool" ondrop="drop(event)" ondragover="allowDrop(event)">
+            </div>
+        <button onclick="window.print()" style="margin-top: 15px; background: #444; color: white;">完成评分 (导出/打印)</button>
     </div>
 
     <script>
@@ -210,6 +221,11 @@
             document.getElementById('pool').appendChild(item);
             document.getElementById('text-input').value = '';
         }
+
+        // 监听回车键添加
+        document.getElementById('text-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTextItem();
+        });
 
         function addImageItem(event) {
             const file = event.target.files[0];
