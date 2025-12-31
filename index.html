@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>从夯到拉 - 终极功能版</title>
+    <title>从夯到拉 - 图片导出版</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
@@ -12,7 +12,6 @@
             --color-1: #ff4444; --color-2: #ff8800; --color-3: #ffbb33;
             --color-4: #00C851; --color-5: #33b5e5; --color-6: #2BBBAD;
             --color-7: #aa66cc; --color-8: #555555;
-            --delete-red: #d32f2f;
         }
 
         body {
@@ -25,6 +24,7 @@
             overflow: hidden;
         }
 
+        /* 导出区域容器 */
         .main-content {
             flex-grow: 1;
             padding: 30px;
@@ -34,11 +34,12 @@
             align-items: center; 
         }
 
+        /* 截图的目标：只有这个 id 里的内容会被保存成图片 */
         #capture-area {
             width: 100%;
             max-width: 1150px;
             background: #000;
-            padding: 20px;
+            padding: 20px; /* 截图时留点黑边更好看 */
         }
 
         .tier-container {
@@ -72,10 +73,9 @@
             align-content: flex-start;
             padding: 8px;
             background-color: rgba(255, 255, 255, 0.02);
-            min-width: 200px;
         }
 
-        /* 侧边栏 */
+        /* 侧边栏样式 */
         .sidebar {
             width: 320px; 
             min-width: 320px;
@@ -90,7 +90,7 @@
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -105,17 +105,18 @@
         }
 
         button {
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
             border: none;
             border-radius: 4px;
             font-weight: bold;
-            transition: 0.2s;
+            margin-bottom: 8px;
         }
 
         .btn-add { background: #3f51b5; color: white; }
         .btn-img { background: #4caf50; color: white; }
-        .btn-save { background: #e91e63; color: white; margin-top: 10px; }
+        .btn-save { background: #e91e63; color: white; margin-top: 10px; } /* 导出按钮亮粉色 */
+        .btn-clear { background: #555; color: white; font-size: 0.8rem; }
 
         #pool {
             flex-grow: 1;
@@ -128,26 +129,6 @@
             padding: 12px;
             align-content: flex-start;
             gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        /* 回收站样式 */
-        #trash-can {
-            height: 80px;
-            border: 2px solid var(--delete-red);
-            background: rgba(211, 47, 47, 0.1);
-            color: var(--delete-red);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        #trash-can.drag-over {
-            background: var(--delete-red);
-            color: white;
-            transform: scale(1.02);
         }
 
         .item {
@@ -165,13 +146,10 @@
             text-align: center;
             padding: 4px;
             box-sizing: border-box;
-            position: relative;
         }
-        .item:hover { border-color: #aaa; }
-        .item:active { cursor: grabbing; }
+
         .item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 档位颜色映射 */
         .r1 .tier-label { background: var(--color-1); }
         .r2 .tier-label { background: var(--color-2); }
         .r3 .tier-label { background: var(--color-3); }
@@ -180,8 +158,6 @@
         .r6 .tier-label { background: var(--color-6); }
         .r7 .tier-label { background: var(--color-7); }
         .r8 .tier-label { background: var(--color-8); color: white; }
-
-        .hint { font-size: 0.75rem; color: #666; margin-top: 5px; text-align: center; }
     </style>
 </head>
 <body>
@@ -191,63 +167,43 @@
             <h2 style="color: #eee; text-align: center; margin-bottom: 20px;">我的 Tier List</h2>
             <div class="tier-container">
                 <div class="tier-row r1"><div class="tier-label">惊为天人</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r2"><div class="tier-label">非同凡响</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r2"><div class="tier-label">臻于化境</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r3"><div class="tier-label">可圈可点</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r4"><div class="tier-label">瑕不掩瑜</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r5"><div class="tier-label">平平无奇</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r6"><div class="tier-label">索然无味</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r7"><div class="tier-label">拙劣不堪</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r7"><div class="tier-label">粗制滥造</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r8"><div class="tier-label">臭不可闻</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
             </div>
         </div>
-    </div>
+        </div>
 
     <div class="sidebar">
         <div class="input-group">
             <textarea id="text-input" placeholder="输入名单(换行/逗号拆分)"></textarea>
             <button class="btn-add" onclick="processInput()">批量添加文本</button>
-            <button class="btn-img" onclick="document.getElementById('file-input').click()">添加图片素材</button>
+            <button class="btn-img" onclick="document.getElementById('file-input').click()">添加图片</button>
             <input type="file" id="file-input" accept="image/*" style="display:none" onchange="addImageItem(event)">
         </div>
         
-        <p style="font-size: 0.8rem; color: #888; margin-bottom: 5px;">备选素材池：</p>
+        <p style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">备选池：</p>
         <div id="pool" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
         
-        <div id="trash-can" 
-             ondrop="deleteItem(event)" 
-             ondragover="allowDrop(event)" 
-             ondragenter="this.classList.add('drag-over')" 
-             ondragleave="this.classList.remove('drag-over')">
-            🗑️ 拖拽至此或右键删除
-        </div>
-        <p class="hint">右键点击素材也可直接删除</p>
-
-        <button class="btn-save" onclick="saveAsImage()">📸 保存并下载图片</button>
-        <button onclick="if(confirm('确定要清空全部吗？')) location.reload()" style="background:#444; color:#ccc; font-size:0.8rem; margin-top:5px;">🔄 重置整个页面</button>
+        <button class="btn-save" onclick="saveAsImage()">📸 保存为图片(PNG)</button>
+        <button class="btn-clear" onclick="location.reload()">🔄 清空所有重来</button>
     </div>
 
     <script>
         function allowDrop(ev) { ev.preventDefault(); }
         function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-        
         function drop(ev) {
             ev.preventDefault();
-            document.getElementById('trash-can').classList.remove('drag-over');
             var data = ev.dataTransfer.getData("text");
             var target = ev.target;
             while (target && !target.classList.contains('tier-dropzone') && target.id !== 'pool') {
                 target = target.parentElement;
             }
             if (target) target.appendChild(document.getElementById(data));
-        }
-
-        // 删除逻辑
-        function deleteItem(ev) {
-            ev.preventDefault();
-            document.getElementById('trash-can').classList.remove('drag-over');
-            var data = ev.dataTransfer.getData("text");
-            var el = document.getElementById(data);
-            if (el) el.remove();
         }
 
         let idCounter = 0;
@@ -257,13 +213,6 @@
             div.draggable = true;
             div.id = 'item-' + idCounter++;
             div.ondragstart = drag;
-            
-            // 阻止右键菜单并执行删除
-            div.oncontextmenu = function(e) {
-                e.preventDefault();
-                if(confirm('删除这个素材？')) this.remove();
-            };
-
             if(isImage) {
                 const img = document.createElement('img');
                 img.src = content;
@@ -290,12 +239,13 @@
             reader.readAsDataURL(file);
         }
 
+        // 保存为图片的函数
         function saveAsImage() {
             const area = document.getElementById('capture-area');
             html2canvas(area, {
-                backgroundColor: "#0a0a0a",
-                scale: 2,
-                useCORS: true
+                backgroundColor: "#0a0a0a", // 背景色与网页一致
+                scale: 2, // 2倍清晰度，防止图片模糊
+                useCORS: true // 允许跨域图片渲染
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'My-Tier-List.png';
@@ -306,5 +256,3 @@
     </script>
 </body>
 </html>
-
-
