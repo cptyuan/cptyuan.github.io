@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>从夯到拉 - 标题可编辑版</title>
+    <title>从夯到拉 - 图片修复版</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
@@ -176,10 +176,12 @@
             color: white;
         }
 
+        /* --- 关键修改点 --- */
         .item {
             width: 68px;
             height: 68px;
             background: #333;
+            color: #ffffff; /* 【重要】强制设置文字颜色为白色，解决截图变黑问题 */
             cursor: grab;
             display: flex;
             align-items: center;
@@ -192,6 +194,8 @@
             padding: 4px;
             box-sizing: border-box;
         }
+        /* ----------------- */
+
         .item:active { cursor: grabbing; }
         .item img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -223,7 +227,7 @@
                 <div class="tier-row r4"><div class="tier-label">瑕不掩瑜</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r5"><div class="tier-label">平平无奇</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r6"><div class="tier-label">索然无味</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r7"><div class="tier-label">拙劣不堪</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r7"><div class="tier-label">粗制滥造</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
                 <div class="tier-row r8"><div class="tier-label">臭不可闻</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
             </div>
         </div>
@@ -320,13 +324,15 @@
             document.activeElement.blur();
             
             html2canvas(area, {
-                backgroundColor: "#0a0a0a",
-                scale: 2, // 提升清晰度
+                backgroundColor: "#0a0a0a", // 确保背景也是黑色的
+                scale: 2,
                 useCORS: true,
                 logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = document.getElementById('editable-title').textContent.trim() + '.png';
+                // 使用标题作为文件名，替换掉非法字符
+                const title = document.getElementById('editable-title').textContent.trim().replace(/[\\/:*?"<>|]/g, '') || 'TierList';
+                link.download = title + '.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
             });
@@ -334,4 +340,3 @@
     </script>
 </body>
 </html>
-
