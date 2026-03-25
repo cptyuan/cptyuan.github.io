@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>从夯到拉 - 终极功能版</title>
+    <title>从夯到拉 - 完美修复版</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
@@ -41,100 +41,40 @@
             padding: 20px;
         }
 
-        .tier-container {
-            width: 100%;
-            border: 1px solid #333;
-        }
-
-        .tier-row {
-            display: flex;
-            min-height: 90px;
-            border-bottom: 1px solid #222;
-        }
-
-        .tier-label {
-            width: 120px;
-            min-width: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #000;
-            padding: 10px;
+        /* 可编辑标题样式优化 */
+        #editable-title {
+            color: #eee;
             text-align: center;
-        }
-
-        .tier-dropzone {
-            flex-grow: 1;
-            display: flex;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            padding: 8px;
-            background-color: rgba(255, 255, 255, 0.02);
-            min-width: 200px;
-        }
-
-        /* 侧边栏 */
-        .sidebar {
-            width: 320px; 
-            min-width: 320px;
-            background: var(--sidebar-bg);
-            border-left: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        textarea#text-input {
-            padding: 12px;
-            background: #000;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 4px;
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        button {
-            padding: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
+            margin-bottom: 25px;
+            font-size: 2rem;
             font-weight: bold;
-            transition: 0.2s;
+            border: 1px dashed transparent;
+            padding: 5px;
+            outline: none;
+            cursor: text;
+            transition: 0.3s;
+        }
+        #editable-title:hover {
+            border-color: #444;
+            background: rgba(255,255,255,0.03);
         }
 
+        .tier-container { width: 100%; border: 1px solid #333; }
+        .tier-row { display: flex; min-height: 90px; border-bottom: 1px solid #222; }
+        .tier-label { width: 120px; min-width: 120px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; color: #000; padding: 10px; text-align: center; }
+        .tier-dropzone { flex-grow: 1; display: flex; flex-wrap: wrap; align-content: flex-start; padding: 8px; background-color: rgba(255, 255, 255, 0.02); min-width: 200px; }
+
+        .sidebar { width: 320px; min-width: 320px; background: var(--sidebar-bg); border-left: 1px solid #333; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        textarea#text-input { padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 4px; resize: vertical; min-height: 80px; }
+        
+        button { padding: 10px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         .btn-add { background: #3f51b5; color: white; }
         .btn-img { background: #4caf50; color: white; }
         .btn-save { background: #e91e63; color: white; margin-top: 10px; }
 
-        #pool {
-            flex-grow: 1;
-            border: 2px dashed #444;
-            border-radius: 8px;
-            background: #111;
-            overflow-y: auto;
-            display: flex;
-            flex-wrap: wrap;
-            padding: 12px;
-            align-content: flex-start;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+        #pool { flex-grow: 1; border: 2px dashed #444; border-radius: 8px; background: #111; overflow-y: auto; display: flex; flex-wrap: wrap; padding: 12px; align-content: flex-start; gap: 10px; margin-bottom: 15px; }
 
-        /* ========================================================
-           🗑️【核心修复点】：为垃圾桶区域增加了 15px 的底部边距。
-           它现在和保存按钮之间有了清晰的间距，不再重合。
-           ======================================================== */
         #trash-can {
             height: 80px;
             border: 2px solid var(--delete-red);
@@ -146,39 +86,13 @@
             border-radius: 8px;
             font-weight: bold;
             transition: 0.3s;
-            margin-bottom: 15px; /* 这里是新增的代码 */
+            margin-bottom: 15px; /* 保持间距修正 */
         }
-        /* ======================================================== */
+        #trash-can.drag-over { background: var(--delete-red); color: white; transform: scale(1.02); }
 
-        #trash-can.drag-over {
-            background: var(--delete-red);
-            color: white;
-            transform: scale(1.02);
-        }
+        .item { width: 68px; height: 68px; background: #333; cursor: grab; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 0.7rem; border: 1px solid #555; overflow: hidden; text-align: center; padding: 4px; box-sizing: border-box; position: relative; color: #fff; }
+        .item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-        .item {
-            width: 68px;
-            height: 68px;
-            background: #333;
-            cursor: grab;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            border: 1px solid #555;
-            overflow: hidden;
-            text-align: center;
-            padding: 4px;
-            box-sizing: border-box;
-            position: relative;
-            color: #fff; /* 确保截图时文字也是白色的 */
-        }
-        .item:hover { border-color: #aaa; }
-        .item:active { cursor: grabbing; }
-        .item img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* 档位颜色映射 */
         .r1 .tier-label { background: var(--color-1); }
         .r2 .tier-label { background: var(--color-2); }
         .r3 .tier-label { background: var(--color-3); }
@@ -187,7 +101,6 @@
         .r6 .tier-label { background: var(--color-6); }
         .r7 .tier-label { background: var(--color-7); }
         .r8 .tier-label { background: var(--color-8); color: white; }
-
         .hint { font-size: 0.75rem; color: #666; margin-top: 5px; text-align: center; }
     </style>
 </head>
@@ -195,16 +108,17 @@
 
     <div class="main-content">
         <div id="capture-area">
-            <h2 style="color: #eee; text-align: center; margin-bottom: 20px;">我的 Tier List</h2>
+            <div id="editable-title" contenteditable="true" onblur="saveData()">我的 Tier List</div>
+            
             <div class="tier-container">
-                <div class="tier-row r1"><div class="tier-label">惊为天人</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r2"><div class="tier-label">臻于化境</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r3"><div class="tier-label">可圈可点</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r4"><div class="tier-label">瑕不掩瑜</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r5"><div class="tier-label">平平无奇</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r6"><div class="tier-label">索然无味</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r7"><div class="tier-label">粗制滥造</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-                <div class="tier-row r8"><div class="tier-label">臭不可闻</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r1" id="row-0"><div class="tier-label">惊为天人</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r2" id="row-1"><div class="tier-label">臻于化境</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r3" id="row-2"><div class="tier-label">可圈可点</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r4" id="row-3"><div class="tier-label">瑕不掩瑜</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r5" id="row-4"><div class="tier-label">平平无奇</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r6" id="row-5"><div class="tier-label">索然无味</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r7" id="row-6"><div class="tier-label">粗制滥造</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+                <div class="tier-row r8" id="row-7"><div class="tier-label">臭不可闻</div><div class="tier-dropzone" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
             </div>
         </div>
     </div>
@@ -220,13 +134,7 @@
         <p style="font-size: 0.8rem; color: #888; margin-bottom: 5px;">备选素材池：</p>
         <div id="pool" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
         
-        <div id="trash-can" 
-             ondrop="deleteItem(event)" 
-             ondragover="allowDrop(event)" 
-             ondragenter="this.classList.add('drag-over')" 
-             ondragleave="this.classList.remove('drag-over')">
-            🗑️ 拖拽至此或右键删除
-        </div>
+        <div id="trash-can" ondrop="deleteItem(event)" ondragover="allowDrop(event)" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')">🗑️ 拖拽或右键删除</div>
         <p class="hint">右键点击素材也可直接删除</p>
 
         <button class="btn-save" onclick="saveAsImage()">📸 保存并下载图片</button>
@@ -245,40 +153,30 @@
             while (target && !target.classList.contains('tier-dropzone') && target.id !== 'pool') {
                 target = target.parentElement;
             }
-            if (target) {
+            if (target && document.getElementById(data)) {
                 target.appendChild(document.getElementById(data));
-                saveData(); // 拖拽后保存
+                saveData();
             }
         }
 
-        // 删除逻辑
         function deleteItem(ev) {
             ev.preventDefault();
             document.getElementById('trash-can').classList.remove('drag-over');
             var data = ev.dataTransfer.getData("text");
             var el = document.getElementById(data);
             if (el) el.remove();
-            saveData(); // 删除后保存
+            saveData();
         }
 
-        let idCounter = Date.now(); // 使用时间戳确保刷新后不冲突
+        let idCounter = Date.now();
         function createItem(content, isImage = false, id = null) {
             const div = document.createElement('div');
             div.className = 'item';
             div.draggable = true;
-            div.id = id || 'item-' + (idCounter++); // 如果没有ID，生成一个
+            div.id = id || 'item-' + (idCounter++);
             div.dataset.isImage = isImage;
             div.ondragstart = drag;
-            
-            // 阻止右键菜单并执行删除
-            div.oncontextmenu = function(e) {
-                e.preventDefault();
-                if(confirm('删除这个素材？')){
-                    this.remove();
-                    saveData(); // 删除后保存
-                }
-            };
-
+            div.oncontextmenu = function(e) { e.preventDefault(); if(confirm('删除这个素材？')){ this.remove(); saveData(); }};
             if(isImage) {
                 const img = document.createElement('img');
                 img.src = content;
@@ -291,11 +189,12 @@
 
         function processInput() {
             const rawValue = document.getElementById('text-input').value;
-            if (!rawValue) return;
-            const items = rawValue.split(/[\n,，]+/).map(s => s.trim()).filter(s => s !== "");
-            items.forEach(text => document.getElementById('pool').appendChild(createItem(text)));
+            if (!rawValue.trim()) return;
+            rawValue.split(/[\n,，]+/).map(s => s.trim()).filter(s => s !== "").forEach(text => {
+                document.getElementById('pool').appendChild(createItem(text));
+            });
             document.getElementById('text-input').value = '';
-            saveData(); // 添加后保存
+            saveData();
         }
 
         function addImageItem(event) {
@@ -304,17 +203,17 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 document.getElementById('pool').appendChild(createItem(e.target.result, true));
-                saveData(); // 添加后保存
+                saveData();
             }
             reader.readAsDataURL(file);
         }
 
         function saveData() {
             const data = {
+                title: document.getElementById('editable-title').textContent,
                 rows: {},
                 pool: []
             };
-            // 存每一行
             document.querySelectorAll('.tier-row').forEach((row, index) => {
                 const tierId = 'tier-' + index;
                 data.rows[tierId] = [];
@@ -326,7 +225,6 @@
                     });
                 });
             });
-            // 存备选池
             document.querySelectorAll('#pool .item').forEach(item => {
                 data.pool.push({
                     id: item.id,
@@ -341,7 +239,11 @@
             const saved = localStorage.getItem('tierlist_v2');
             if (!saved) return;
             const data = JSON.parse(saved);
-            // 恢复每一行
+            
+            // 恢复标题
+            if(data.title) document.getElementById('editable-title').textContent = data.title;
+            
+            // 恢复行
             document.querySelectorAll('.tier-row').forEach((row, index) => {
                 const tierId = 'tier-' + index;
                 const zone = row.querySelector('.tier-dropzone');
@@ -352,34 +254,33 @@
                 }
             });
             // 恢复备选池
-            const pool = document.getElementById('pool');
             data.pool.forEach(item => {
-                pool.appendChild(createItem(item.content, item.isImage, item.id));
+                document.getElementById('pool').appendChild(createItem(item.content, item.isImage, item.id));
             });
         }
 
         function clearLocalStorage() {
-            if(confirm('确定要清空全部（包括存档）吗？')){
+            if(confirm('确定要清空全部数据吗？')){
                 localStorage.removeItem('tierlist_v2');
                 location.reload();
             }
         }
 
         function saveAsImage() {
-            const area = document.getElementById('capture-area');
-            html2canvas(area, {
+            // 保存前取消标题焦点，避免光标被录入
+            document.getElementById('editable-title').blur();
+            html2canvas(document.getElementById('capture-area'), {
                 backgroundColor: "#0a0a0a",
                 scale: 2,
                 useCORS: true
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'My-Tier-List.png';
+                link.download = document.getElementById('editable-title').textContent + '.png';
                 link.href = canvas.toDataURL("image/png");
                 link.click();
             });
         }
 
-        // 页面加载时读取数据
         window.addEventListener('load', loadData);
     </script>
 </body>
